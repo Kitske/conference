@@ -12,6 +12,7 @@ import com.google.devrel.training.conference.domain.Profile;
 import com.google.devrel.training.conference.form.ProfileForm;
 import com.google.devrel.training.conference.form.ProfileForm.TeeShirtSize;
 import com.googlecode.objectify.Key;
+import com.googlecode.objectify.ObjectifyService;
 
 /**
  * Defines conference APIs.
@@ -58,6 +59,10 @@ public class ConferenceApi {
         // TODO 2
         // If the user is not logged in, throw an UnauthorizedException
         Profile p = getProfile(u);
+        if (p == null)
+        p = new Profile(userId, displayName, mainEmail, teeShirtSize);
+        else
+        p.update(displayName,teeShirtSize);
         // TODO 1
         // Set the teeShirtSize to the value sent by the ProfileForm, if sent
         // otherwise leave it as the default value
@@ -82,8 +87,9 @@ public class ConferenceApi {
 
         // TODO 3 (In Lesson 3)
         // Save the Profile entity in the datastore
-
+        ofy().save().entity(profile).now();
         // Return the profile
+
         return profile;
     }
 
@@ -106,8 +112,8 @@ public class ConferenceApi {
         // TODO
         // load the Profile Entity
         String userId = user.getUserId(); // TODO
-        Key key = null; // TODO
-        Profile profile = null; // TODO load the Profile entity
+        Key<Profile> key = Key.create(Profile.class,userId); // TODO
+        Profile profile = ofy().load().key(key).now(); // TODO load the Profile entity
         return profile;
     }
 }
